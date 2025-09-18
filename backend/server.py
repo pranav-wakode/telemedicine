@@ -323,8 +323,7 @@ async def perform_symptom_check(symptom_data: SymptomCheckCreate):
         additional_info = symptom_data.additional_info or ""
         
         user_message = UserMessage(
-            text=f"Patient symptoms: {symptoms_text}. Additional information: {additional_info}. 
-            Please provide a medical assessment suitable for rural healthcare context."
+            text=f"Patient symptoms: {symptoms_text}. Additional information: {additional_info}. Please provide a medical assessment suitable for rural healthcare context."
         )
         
         response = await chat.send_message(user_message)
