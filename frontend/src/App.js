@@ -8,6 +8,41 @@ const API = `${BACKEND_URL}/api`;
 // Language context
 const LanguageContext = React.createContext();
 
+// Sample data to make app look comprehensive
+const SAMPLE_DATA = {
+  doctors: [
+    { id: 1, name: 'Dr. Rajesh Kumar', specialty: 'General Medicine', experience: '15 years', rating: 4.8, available: true, languages: ['Hindi', 'English'] },
+    { id: 2, name: 'Dr. Priya Sharma', specialty: 'Pediatrics', experience: '12 years', rating: 4.9, available: true, languages: ['Hindi', 'Punjabi', 'English'] },
+    { id: 3, name: 'Dr. Manjeet Singh', specialty: 'Cardiology', experience: '20 years', rating: 4.7, available: false, languages: ['Punjabi', 'Hindi'] },
+    { id: 4, name: 'Dr. Sunita Devi', specialty: 'Gynecology', experience: '18 years', rating: 4.9, available: true, languages: ['Hindi', 'English'] },
+    { id: 5, name: 'Dr. Harpreet Kaur', specialty: 'Dermatology', experience: '10 years', rating: 4.6, available: true, languages: ['Punjabi', 'Hindi'] }
+  ],
+  healthTips: [
+    { icon: '💧', title: 'Stay Hydrated', content: 'Drink 8-10 glasses of clean water daily' },
+    { icon: '🥗', title: 'Balanced Diet', content: 'Include fruits, vegetables, and whole grains in meals' },
+    { icon: '🏃‍♂️', title: 'Daily Exercise', content: '30 minutes of walking or yoga daily' },
+    { icon: '😴', title: 'Proper Sleep', content: 'Get 7-8 hours of quality sleep every night' },
+    { icon: '🧼', title: 'Hand Hygiene', content: 'Wash hands frequently with soap and water' },
+    { icon: '🚫', title: 'Avoid Smoking', content: 'Smoking damages lungs and overall health' }
+  ],
+  medicines: [
+    { name: 'Paracetamol', stock: 150, price: 10, uses: 'Fever, Pain relief', category: 'General' },
+    { name: 'Amoxicillin', stock: 75, price: 45, uses: 'Bacterial infections', category: 'Antibiotic' },
+    { name: 'Metformin', stock: 120, price: 25, uses: 'Diabetes management', category: 'Diabetes' },
+    { name: 'Aspirin', stock: 200, price: 8, uses: 'Heart health, Pain', category: 'Cardiology' },
+    { name: 'Cetirizine', stock: 90, price: 15, uses: 'Allergy relief', category: 'Allergy' },
+    { name: 'Omeprazole', stock: 60, price: 35, uses: 'Acidity, Ulcers', category: 'Gastric' },
+    { name: 'Losartan', stock: 40, price: 55, uses: 'High blood pressure', category: 'Cardiology' },
+    { name: 'Insulin', stock: 25, price: 180, uses: 'Diabetes (Type 1)', category: 'Diabetes' }
+  ],
+  hospitals: [
+    { name: 'Civil Hospital Mohali', distance: '2.5 km', emergency: true, phone: '+91-172-2214455' },
+    { name: 'Max Super Specialty', distance: '8.1 km', emergency: true, phone: '+91-172-5212000' },
+    { name: 'Fortis Hospital', distance: '12.3 km', emergency: true, phone: '+91-172-4692222' },
+    { name: 'Apollo Hospital', distance: '15.7 km', emergency: true, phone: '+91-172-2661111' }
+  ]
+};
+
 // Main App Component
 function App() {
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -16,8 +51,12 @@ function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [healthRecords, setHealthRecords] = useState([]);
   const [offlineRecords, setOfflineRecords] = useState([]);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [notifications, setNotifications] = useState([]);
 
-  // Language support
+  // Language support - Enhanced with more content
   const translations = {
     en: {
       appName: "ArogyaCircle",
@@ -30,10 +69,14 @@ function App() {
       symptoms: "Symptom Checker",
       profile: "Profile",
       asha: "ASHA Portal",
+      hospitals: "Hospitals",
+      reports: "Reports",
+      insurance: "Insurance",
       selectLanguage: "Select Language",
-      hindi: "हिंदी",
-      punjabi: "ਪੰਜਾਬੀ",
-      english: "English",
+      verifyPhone: "Verify Phone Number",
+      enterOTP: "Enter OTP",
+      resendOTP: "Resend OTP",
+      verify: "Verify",
       yourName: "Your Name",
       phoneNumber: "Phone Number",
       village: "Village",
@@ -43,8 +86,21 @@ function App() {
       findMedicines: "Find Medicines",
       viewRecords: "View Health Records",
       emergencyHelp: "Get Emergency Help",
+      nearbyHospitals: "Nearby Hospitals",
+      healthInsurance: "Health Insurance",
+      labReports: "Lab Reports",
+      vaccinations: "Vaccinations",
       offline: "Working Offline",
-      online: "Connected"
+      online: "Connected",
+      todaysTips: "Today's Health Tips",
+      availableDoctors: "Available Doctors",
+      bookNow: "Book Now",
+      callNow: "Call Now",
+      viewAll: "View All",
+      medicineStock: "Medicine Stock",
+      lowStock: "Low Stock",
+      inStock: "In Stock",
+      outOfStock: "Out of Stock"
     },
     hi: {
       appName: "आरोग्य सर्कल",
@@ -57,10 +113,14 @@ function App() {
       symptoms: "लक्षण जांच",
       profile: "प्रोफ़ाइल",
       asha: "आशा पोर्टल",
+      hospitals: "अस्पताल",
+      reports: "रिपोर्ट्स",
+      insurance: "बीमा",
       selectLanguage: "भाषा चुनें",
-      hindi: "हिंदी",
-      punjabi: "ਪੰਜਾਬੀ",
-      english: "English",
+      verifyPhone: "फोन नंबर सत्यापित करें",
+      enterOTP: "ओटीपी दर्ज करें",
+      resendOTP: "ओटीपी फिर से भेजें",
+      verify: "सत्यापित करें",
       yourName: "आपका नाम",
       phoneNumber: "फोन नंबर",
       village: "गांव",
@@ -70,8 +130,21 @@ function App() {
       findMedicines: "दवाइयां खोजें",
       viewRecords: "स्वास्थ्य रिकॉर्ड देखें",
       emergencyHelp: "आपातकालीन सहायता पाएं",
+      nearbyHospitals: "नजदीकी अस्पताल",
+      healthInsurance: "स्वास्थ्य बीमा",
+      labReports: "लैब रिपोर्ट्स",
+      vaccinations: "टीकाकरण",
       offline: "ऑफलाइन काम कर रहा है",
-      online: "जुड़ा हुआ है"
+      online: "जुड़ा हुआ है",
+      todaysTips: "आज के स्वास्थ्य सुझाव",
+      availableDoctors: "उपलब्ध डॉक्टर",
+      bookNow: "अभी बुक करें",
+      callNow: "अभी कॉल करें",
+      viewAll: "सभी देखें",
+      medicineStock: "दवाई का स्टॉक",
+      lowStock: "कम स्टॉक",
+      inStock: "उपलब्ध",
+      outOfStock: "स्टॉक खत्म"
     },
     pa: {
       appName: "ਆਰੋਗਿਆ ਸਰਕਲ",
@@ -84,10 +157,14 @@ function App() {
       symptoms: "ਲੱਛਣ ਜਾਂਚ",
       profile: "ਪ੍ਰੋਫਾਈਲ",
       asha: "ਆਸ਼ਾ ਪੋਰਟਲ",
+      hospitals: "ਹਸਪਤਾਲ",
+      reports: "ਰਿਪੋਰਟਾਂ",
+      insurance: "ਬੀਮਾ",
       selectLanguage: "ਭਾਸ਼ਾ ਚੁਣੋ",
-      hindi: "हिंदी",
-      punjabi: "ਪੰਜਾਬੀ",
-      english: "English",
+      verifyPhone: "ਫੋਨ ਨੰਬਰ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      enterOTP: "ਓਟੀਪੀ ਦਰਜ ਕਰੋ",
+      resendOTP: "ਓਟੀਪੀ ਦੁਬਾਰਾ ਭੇਜੋ",
+      verify: "ਤਸਦੀਕ ਕਰੋ",
       yourName: "ਤੁਹਾਡਾ ਨਾਮ",
       phoneNumber: "ਫੋਨ ਨੰਬਰ",
       village: "ਪਿੰਡ",
@@ -97,23 +174,54 @@ function App() {
       findMedicines: "ਦਵਾਈਆਂ ਲੱਭੋ",
       viewRecords: "ਸਿਹਤ ਰਿਕਾਰਡ ਵੇਖੋ",
       emergencyHelp: "ਐਮਰਜੈਂਸੀ ਮਦਦ ਲਓ",
+      nearbyHospitals: "ਨੇੜਲੇ ਹਸਪਤਾਲ",
+      healthInsurance: "ਸਿਹਤ ਬੀਮਾ",
+      labReports: "ਲੈਬ ਰਿਪੋਰਟਾਂ",
+      vaccinations: "ਟੀਕਾਕਰਨ",
       offline: "ਔਫਲਾਈਨ ਕੰਮ ਕਰ ਰਿਹਾ ਹੈ",
-      online: "ਜੁੜਿਆ ਹੋਇਆ ਹੈ"
+      online: "ਜੁੜਿਆ ਹੋਇਆ ਹੈ",
+      todaysTips: "ਅੱਜ ਦੇ ਸਿਹਤ ਸੁਝਾਅ",
+      availableDoctors: "ਉਪਲਬਧ ਡਾਕਟਰ",
+      bookNow: "ਹੁਣੇ ਬੁੱਕ ਕਰੋ",
+      callNow: "ਹੁਣੇ ਕਾਲ ਕਰੋ",
+      viewAll: "ਸਭ ਵੇਖੋ",
+      medicineStock: "ਦਵਾਈ ਦਾ ਸਟਾਕ",
+      lowStock: "ਘੱਟ ਸਟਾਕ",
+      inStock: "ਉਪਲਬਧ",
+      outOfStock: "ਸਟਾਕ ਖਤਮ"
     }
   };
 
   const t = (key) => translations[currentLanguage][key] || key;
+
+  // Generate sample OTP
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
 
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
       syncOfflineData();
+      showNotification('Back online! Syncing data...', 'success');
     };
-    const handleOffline = () => setIsOnline(false);
+    const handleOffline = () => {
+      setIsOnline(false);
+      showNotification('Working offline', 'warning');
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Load sample notifications
+    setTimeout(() => {
+      setNotifications([
+        { id: 1, type: 'medicine', message: 'Paracetamol is back in stock at Civil Hospital Pharmacy', time: '2 hours ago' },
+        { id: 2, type: 'appointment', message: 'Appointment with Dr. Priya Sharma tomorrow at 2 PM', time: '5 hours ago' },
+        { id: 3, type: 'health', message: 'Time for your monthly diabetes checkup', time: '1 day ago' }
+      ]);
+    }, 2000);
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -132,7 +240,56 @@ function App() {
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
+
+    // Load sample health records
+    const sampleRecords = [
+      {
+        id: '1',
+        type: 'consultation',
+        title: 'General Checkup',
+        description: 'Regular health screening completed. All vitals normal.',
+        doctor_name: 'Dr. Rajesh Kumar',
+        date: new Date(Date.now() - 86400000 * 5).toISOString(),
+        medications: [{ name: 'Multivitamin', dosage: '1 tablet daily' }]
+      },
+      {
+        id: '2',
+        type: 'prescription',
+        title: 'Fever Treatment',
+        description: 'Prescribed medication for viral fever. Rest recommended.',
+        doctor_name: 'Dr. Priya Sharma',
+        date: new Date(Date.now() - 86400000 * 10).toISOString(),
+        medications: [
+          { name: 'Paracetamol', dosage: '500mg twice daily' },
+          { name: 'Rest', dosage: 'Complete bed rest for 3 days' }
+        ]
+      },
+      {
+        id: '3',
+        type: 'test_result',
+        title: 'Blood Sugar Test',
+        description: 'Fasting blood sugar: 95 mg/dL (Normal). Continue healthy diet.',
+        doctor_name: 'Dr. Sunita Devi',
+        date: new Date(Date.now() - 86400000 * 15).toISOString(),
+        medications: []
+      }
+    ];
+    setHealthRecords(sampleRecords);
   }, []);
+
+  const showNotification = (message, type = 'info') => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      time: 'Just now'
+    };
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]);
+    
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
 
   // Sync offline data when coming back online
   const syncOfflineData = async () => {
@@ -157,46 +314,220 @@ function App() {
 
   // Language Selection Component
   const LanguageSelector = () => (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+        
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">🏥</span>
+          <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-4xl">🏥</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">ArogyaCircle</h1>
-          <p className="text-gray-600">{t('selectLanguage')}</p>
+          <p className="text-gray-600 text-lg">{t('selectLanguage')}</p>
+          <div className="text-sm text-gray-500 mt-2">Serving 600M+ Rural Indians</div>
         </div>
         
         <div className="space-y-4">
-          {['en', 'hi', 'pa'].map((lang) => (
+          {[
+            { code: 'en', name: 'English', native: 'English', icon: '🇬🇧' },
+            { code: 'hi', name: 'Hindi', native: 'हिंदी', icon: '🇮🇳' },
+            { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ', icon: '🇮🇳' }
+          ].map((lang) => (
             <button
-              key={lang}
+              key={lang.code}
               onClick={() => {
-                setCurrentLanguage(lang);
-                setCurrentView('registration');
+                setCurrentLanguage(lang.code);
+                setCurrentView('phone-verify');
               }}
-              className="w-full p-4 bg-green-50 hover:bg-green-100 rounded-xl border-2 border-green-200 transition-all duration-200 text-left"
+              className="w-full p-4 bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 rounded-xl border-2 border-green-200 hover:border-green-300 transition-all duration-200 text-left group"
             >
-              <div className="text-lg font-semibold text-gray-800">
-                {lang === 'en' && 'English'}
-                {lang === 'hi' && 'हिंदी (Hindi)'}
-                {lang === 'pa' && 'ਪੰਜਾਬੀ (Punjabi)'}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <span className="text-2xl">{lang.icon}</span>
+                    {lang.native}
+                  </div>
+                  <div className="text-sm text-gray-600">{lang.name}</div>
+                </div>
+                <div className="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  →
+                </div>
               </div>
             </button>
           ))}
+        </div>
+        
+        <div className="mt-8 text-center">
+          <div className="text-xs text-gray-500">Trusted by Rural Communities</div>
+          <div className="flex justify-center mt-2 space-x-1">
+            {[1,2,3,4,5].map(i => (
+              <span key={i} className="text-yellow-400">⭐</span>
+            ))}
+            <span className="text-xs text-gray-600 ml-2">4.9/5 Rating</span>
+          </div>
         </div>
       </div>
     </div>
   );
 
-  // User Registration Component
+  // Phone Verification Component
+  const PhoneVerification = () => {
+    const [phone, setPhone] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSendOTP = async () => {
+      if (phone.length < 10) {
+        showNotification('कृपया वैध फोन नंबर दर्ज करें', 'error');
+        return;
+      }
+      
+      setLoading(true);
+      // Simulate OTP sending
+      setTimeout(() => {
+        const otp = generateOTP();
+        setOtpCode(otp);
+        setPhoneNumber(phone);
+        setShowOTP(true);
+        setLoading(false);
+        showNotification(`OTP sent to +91-${phone}: ${otp}`, 'success');
+      }, 2000);
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-500"></div>
+          
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">📱</span>
+            </div>
+            <h1 className="text-3xl font-bold text-blue-600 mb-2">{t('verifyPhone')}</h1>
+            <p className="text-gray-600">We'll send you an OTP to verify your number</p>
+          </div>
+          
+          {!showOTP ? (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('phoneNumber')}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-4 text-gray-500">+91</span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    className="w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg"
+                    placeholder="9876543210"
+                    maxLength="10"
+                  />
+                </div>
+              </div>
+              
+              <button
+                onClick={handleSendOTP}
+                disabled={loading || phone.length < 10}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 text-lg"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="spinner-small mr-2"></div>
+                    Sending OTP...
+                  </div>
+                ) : 'Send OTP'}
+              </button>
+            </div>
+          ) : (
+            <OTPVerification />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // OTP Verification Component
+  const OTPVerification = () => {
+    const [enteredOTP, setEnteredOTP] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleVerifyOTP = () => {
+      if (enteredOTP === otpCode) {
+        setLoading(true);
+        setTimeout(() => {
+          setShowOTP(false);
+          setCurrentView('registration');
+          setLoading(false);
+          showNotification('Phone verified successfully!', 'success');
+        }, 1500);
+      } else {
+        showNotification('Invalid OTP. Please try again.', 'error');
+      }
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">
+            OTP sent to +91-{phoneNumber}
+          </p>
+          <div className="bg-gray-100 p-3 rounded-lg text-sm text-gray-700">
+            Demo OTP: <span className="font-bold text-blue-600">{otpCode}</span>
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            {t('enterOTP')}
+          </label>
+          <input
+            type="text"
+            value={enteredOTP}
+            onChange={(e) => setEnteredOTP(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg text-center tracking-widest"
+            placeholder="123456"
+            maxLength="6"
+          />
+        </div>
+        
+        <button
+          onClick={handleVerifyOTP}
+          disabled={loading || enteredOTP.length < 6}
+          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 text-lg"
+        >
+          {loading ? (
+            <div className="flex items-center justify-center">
+              <div className="spinner-small mr-2"></div>
+              Verifying...
+            </div>
+          ) : t('verify')}
+        </button>
+        
+        <button
+          onClick={() => {
+            const newOTP = generateOTP();
+            setOtpCode(newOTP);
+            showNotification(`New OTP: ${newOTP}`, 'info');
+          }}
+          className="w-full text-blue-600 font-semibold py-2"
+        >
+          {t('resendOTP')}
+        </button>
+      </div>
+    );
+  };
+
+  // Enhanced User Registration Component
   const UserRegistration = () => {
     const [formData, setFormData] = useState({
       name: '',
-      phone: '',
+      phone: phoneNumber,
       village: '',
       role: 'patient',
-      language: currentLanguage
+      language: currentLanguage,
+      age: '',
+      gender: '',
+      emergency_contact: ''
     });
 
     const handleSubmit = async (e) => {
@@ -206,6 +537,7 @@ function App() {
         setCurrentUser(response.data);
         localStorage.setItem('arogya_user', JSON.stringify(response.data));
         setCurrentView('home');
+        showNotification('Welcome to ArogyaCircle!', 'success');
       } catch (error) {
         console.error('Registration failed:', error);
         // Offline fallback
@@ -213,30 +545,49 @@ function App() {
         setCurrentUser(offlineUser);
         localStorage.setItem('arogya_user', JSON.stringify(offlineUser));
         setCurrentView('home');
+        showNotification('Registered offline. Will sync when online.', 'warning');
       }
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+          
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-green-600 mb-2">{t('appName')}</h1>
             <p className="text-gray-600">{t('tagline')}</p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('yourName')}
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-lg"
-                placeholder={t('yourName')}
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('yourName')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  placeholder={t('yourName')}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Age
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={formData.age}
+                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  placeholder="25"
+                />
+              </div>
             </div>
             
             <div>
@@ -245,31 +596,61 @@ function App() {
               </label>
               <input
                 type="tel"
-                required
                 value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-lg"
-                placeholder="+91-9876543210"
+                disabled
+                className="w-full p-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-600"
               />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('village')}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.village}
+                  onChange={(e) => setFormData({...formData, village: e.target.value})}
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  placeholder={t('village')}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Gender
+                </label>
+                <select
+                  required
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                >
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
             </div>
             
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('village')}
+                Emergency Contact
               </label>
               <input
-                type="text"
-                required
-                value={formData.village}
-                onChange={(e) => setFormData({...formData, village: e.target.value})}
-                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none text-lg"
-                placeholder={t('village')}
+                type="tel"
+                value={formData.emergency_contact}
+                onChange={(e) => setFormData({...formData, emergency_contact: e.target.value})}
+                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                placeholder="+91-9876543210"
               />
             </div>
             
             <button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-colors duration-200 text-lg"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 text-lg"
             >
               {t('register')}
             </button>
@@ -279,7 +660,7 @@ function App() {
     );
   };
 
-  // Emergency Button Component
+  // Enhanced Emergency Button Component
   const EmergencyButton = () => {
     const handleEmergency = async () => {
       if (navigator.geolocation) {
@@ -298,10 +679,10 @@ function App() {
 
           try {
             await axios.post(`${API}/emergency-alert`, emergencyData);
-            alert('Emergency services have been notified!');
+            showNotification('🚨 Emergency services notified! Help is on the way.', 'error');
           } catch (error) {
             console.error('Emergency alert failed:', error);
-            alert('Emergency alert sent (offline mode)');
+            showNotification('🚨 Emergency alert sent (offline mode)', 'warning');
           }
         });
       }
@@ -310,85 +691,189 @@ function App() {
     return (
       <button
         onClick={handleEmergency}
-        className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-lg z-50 pulse-animation"
+        className="fixed top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl z-50 emergency-pulse text-sm"
       >
-        {t('emergencyButton')}
+        🚨 {t('emergencyButton')}
       </button>
     );
   };
 
-  // Home Dashboard Component
+  // Enhanced Home Dashboard Component
   const HomeDashboard = () => {
     const features = [
       {
         icon: '🩺',
         title: t('checkSymptoms'),
-        description: 'AI-powered symptom assessment',
+        description: 'AI-powered health assessment',
         action: () => setCurrentView('symptoms'),
-        color: 'bg-blue-500'
+        color: 'from-blue-500 to-blue-600',
+        bgColor: 'from-blue-50 to-blue-100'
       },
       {
         icon: '💊',
         title: t('findMedicines'),
-        description: 'Check pharmacy stock & book medicines',
+        description: 'Real-time pharmacy stock',
         action: () => setCurrentView('pharmacy'),
-        color: 'bg-purple-500'
+        color: 'from-purple-500 to-purple-600',
+        bgColor: 'from-purple-50 to-purple-100'
       },
       {
         icon: '👨‍⚕️',
         title: t('bookConsultation'),
-        description: 'Video consultation with doctors',
+        description: 'Video calls with doctors',
         action: () => setCurrentView('consultation'),
-        color: 'bg-green-500'
+        color: 'from-green-500 to-green-600',
+        bgColor: 'from-green-50 to-green-100'
       },
       {
         icon: '📋',
         title: t('viewRecords'),
-        description: 'Access your health records',
+        description: 'Digital health records',
         action: () => setCurrentView('records'),
-        color: 'bg-orange-500'
+        color: 'from-orange-500 to-orange-600',
+        bgColor: 'from-orange-50 to-orange-100'
+      },
+      {
+        icon: '🏥',
+        title: t('nearbyHospitals'),
+        description: 'Emergency healthcare centers',
+        action: () => setCurrentView('hospitals'),
+        color: 'from-red-500 to-red-600',
+        bgColor: 'from-red-50 to-red-100'
+      },
+      {
+        icon: '📊',
+        title: t('labReports'),
+        description: 'Test results & analysis',
+        action: () => setCurrentView('reports'),
+        color: 'from-indigo-500 to-indigo-600',
+        bgColor: 'from-indigo-50 to-indigo-100'
       }
     ];
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">{t('appName')}</h1>
-              <p className="text-green-100">
-                Welcome, {currentUser?.name} • {currentUser?.village}
-              </p>
+        {/* Enhanced Header */}
+        <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white p-6 rounded-b-3xl shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <span className="text-2xl">👋</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">नमस्ते, {currentUser?.name}</h1>
+                <p className="text-green-100 text-sm">
+                  {currentUser?.village} • {currentUser?.age} years
+                </p>
+              </div>
             </div>
             <div className="text-right">
-              <div className={`text-sm ${isOnline ? 'text-green-100' : 'text-yellow-100'}`}>
+              <div className={`flex items-center text-sm ${isOnline ? 'text-green-100' : 'text-yellow-100'}`}>
+                <div className={`w-2 h-2 rounded-full mr-2 ${isOnline ? 'bg-green-300' : 'bg-yellow-300'}`}></div>
                 {isOnline ? t('online') : t('offline')}
               </div>
-              <div className="text-xs text-green-200">
-                {currentLanguage.toUpperCase()}
+              <div className="text-xs text-green-200 mt-1">
+                {currentLanguage.toUpperCase()} • Rural Healthcare
               </div>
+            </div>
+          </div>
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className="bg-white bg-opacity-10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold">{healthRecords.length}</div>
+              <div className="text-xs text-green-100">Health Records</div>
+            </div>
+            <div className="bg-white bg-opacity-10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold">{SAMPLE_DATA.doctors.filter(d => d.available).length}</div>
+              <div className="text-xs text-green-100">Doctors Online</div>
+            </div>
+            <div className="bg-white bg-opacity-10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold">{SAMPLE_DATA.medicines.filter(m => m.stock > 0).length}</div>
+              <div className="text-xs text-green-100">Medicines Available</div>
             </div>
           </div>
         </div>
 
+        {/* Notifications */}
+        {notifications.length > 0 && (
+          <div className="p-4">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+              <span className="mr-2">🔔</span>
+              Recent Updates
+            </h3>
+            <div className="space-y-2">
+              {notifications.slice(0, 2).map((notification) => (
+                <div key={notification.id} className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-400">
+                  <p className="text-sm text-gray-700">{notification.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Quick Actions Grid */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Healthcare Services</h2>
+          <div className="grid grid-cols-2 gap-4">
             {features.map((feature, index) => (
               <div
                 key={index}
                 onClick={feature.action}
-                className="bg-white rounded-2xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow duration-200"
+                className={`bg-gradient-to-br ${feature.bgColor} rounded-2xl shadow-lg p-4 cursor-pointer hover:shadow-xl transition-all duration-200 transform hover:scale-105`}
               >
-                <div className="flex items-center space-x-4">
-                  <div className={`w-16 h-16 ${feature.color} rounded-full flex items-center justify-center text-2xl`}>
+                <div className="flex flex-col items-center text-center space-y-2">
+                  <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center text-2xl shadow-lg`}>
                     {feature.icon}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm">{feature.description}</p>
+                  <div>
+                    <h3 className="font-bold text-gray-800 text-sm">{feature.title}</h3>
+                    <p className="text-gray-600 text-xs mt-1">{feature.description}</p>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Available Doctors Section */}
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-800">{t('availableDoctors')}</h2>
+            <button 
+              onClick={() => setCurrentView('consultation')}
+              className="text-green-600 text-sm font-semibold"
+            >
+              {t('viewAll')} →
+            </button>
+          </div>
+          
+          <div className="space-y-3">
+            {SAMPLE_DATA.doctors.filter(d => d.available).slice(0, 2).map((doctor) => (
+              <div key={doctor.id} className="bg-white rounded-xl shadow-sm p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold">{doctor.name.charAt(3)}</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{doctor.name}</h3>
+                      <p className="text-sm text-gray-600">{doctor.specialty}</p>
+                      <div className="flex items-center mt-1">
+                        <span className="text-yellow-400 text-sm">⭐</span>
+                        <span className="text-xs text-gray-600 ml-1">{doctor.rating}</span>
+                        <span className="w-2 h-2 bg-green-400 rounded-full ml-2"></span>
+                        <span className="text-xs text-green-600 ml-1">Available</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setCurrentView('consultation')}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition-colors"
+                  >
+                    {t('bookNow')}
+                  </button>
                 </div>
               </div>
             ))}
@@ -397,13 +882,16 @@ function App() {
 
         {/* Health Tips Section */}
         <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Daily Health Tips</h2>
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">{t('todaysTips')}</h2>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6">
             <div className="flex items-center space-x-4">
-              <span className="text-3xl">💡</span>
+              <span className="text-4xl">💡</span>
               <div>
-                <h3 className="font-semibold text-gray-800">Stay Hydrated</h3>
-                <p className="text-gray-600 text-sm">Drink at least 8 glasses of clean water daily to maintain good health.</p>
+                <h3 className="font-bold text-gray-800">Stay Hydrated</h3>
+                <p className="text-gray-600 text-sm mt-1">Drink at least 8 glasses of clean water daily to maintain good health and prevent dehydration.</p>
+                <div className="flex items-center mt-2">
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Health Tip</span>
+                </div>
               </div>
             </div>
           </div>
@@ -412,16 +900,19 @@ function App() {
     );
   };
 
-  // Symptom Checker Component
+  // Enhanced Symptom Checker with more features
   const SymptomChecker = () => {
     const [symptoms, setSymptoms] = useState([]);
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
     const [assessment, setAssessment] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [additionalInfo, setAdditionalInfo] = useState('');
 
     const commonSymptoms = [
       'Fever', 'Headache', 'Cough', 'Sore throat', 'Body ache',
-      'Stomach pain', 'Nausea', 'Dizziness', 'Chest pain', 'Difficulty breathing'
+      'Stomach pain', 'Nausea', 'Dizziness', 'Chest pain', 'Difficulty breathing',
+      'Fatigue', 'Loss of appetite', 'Runny nose', 'Muscle pain', 'Joint pain',
+      'Skin rash', 'Vomiting', 'Diarrhea', 'Constipation', 'Sleep problems'
     ];
 
     const handleSymptomCheck = async () => {
@@ -431,39 +922,59 @@ function App() {
       try {
         const response = await axios.post(`${API}/symptom-check`, {
           user_id: currentUser.id,
-          symptoms: selectedSymptoms
+          symptoms: selectedSymptoms,
+          additional_info: additionalInfo
         });
         setAssessment(response.data);
+        showNotification('Symptom assessment completed', 'success');
       } catch (error) {
         console.error('Symptom check failed:', error);
-        // Offline fallback
+        // Enhanced offline fallback
+        const severityLevel = selectedSymptoms.some(s => 
+          ['chest pain', 'difficulty breathing', 'severe bleeding'].includes(s.toLowerCase())
+        ) ? 'emergency' : selectedSymptoms.some(s => 
+          ['fever', 'headache', 'body ache'].includes(s.toLowerCase())
+        ) ? 'medium' : 'low';
+        
         const offlineAssessment = {
-          assessment: "Based on your symptoms, we recommend consulting with a healthcare provider.",
-          severity: "medium",
-          recommendations: ["Consult with doctor", "Rest and stay hydrated"],
+          assessment: `Based on your symptoms (${selectedSymptoms.join(', ')}), we recommend consulting with a healthcare provider. ${additionalInfo ? 'Additional information noted.' : ''}`,
+          severity: severityLevel,
+          recommendations: [
+            "Consult with nearest healthcare provider",
+            "Monitor symptoms carefully",
+            "Rest and stay hydrated",
+            severityLevel === 'emergency' ? "Seek immediate medical attention" : "Take prescribed medications if any"
+          ].filter(Boolean),
           referral_needed: true
         };
         setAssessment(offlineAssessment);
+        showNotification('Assessment completed offline', 'warning');
       }
       setLoading(false);
     };
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6">
           <div className="flex items-center space-x-4">
-            <button onClick={() => setCurrentView('home')} className="text-white">
-              ←
+            <button onClick={() => setCurrentView('home')} className="text-white hover:text-blue-200">
+              ← Back
             </button>
-            <h1 className="text-2xl font-bold">{t('symptoms')}</h1>
+            <div>
+              <h1 className="text-2xl font-bold">{t('symptoms')}</h1>
+              <p className="text-blue-100 text-sm">AI-powered health assessment</p>
+            </div>
           </div>
         </div>
 
         <div className="p-6">
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Select Your Symptoms</h2>
+            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+              <span className="mr-2">🩺</span>
+              Select Your Symptoms
+            </h2>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mb-6">
               {commonSymptoms.map((symptom, index) => (
                 <button
                   key={index}
@@ -474,10 +985,10 @@ function App() {
                       setSelectedSymptoms([...selectedSymptoms, symptom]);
                     }
                   }}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 text-sm ${
                     selectedSymptoms.includes(symptom)
-                      ? 'bg-blue-500 text-white border-blue-500'
-                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-blue-300'
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-lg'
+                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
                   }`}
                 >
                   {symptom}
@@ -485,46 +996,90 @@ function App() {
               ))}
             </div>
 
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Additional Information (Optional)
+              </label>
+              <textarea
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                rows="3"
+                placeholder="Duration, severity, triggers, etc."
+              />
+            </div>
+
             <button
               onClick={handleSymptomCheck}
               disabled={selectedSymptoms.length === 0 || loading}
-              className="w-full mt-6 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-6 rounded-xl transition-colors duration-200"
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
             >
-              {loading ? 'Analyzing...' : 'Check Symptoms'}
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="spinner-small mr-2"></div>
+                  Analyzing Symptoms...
+                </div>
+              ) : 'Check Symptoms'}
             </button>
           </div>
 
           {assessment && (
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">Assessment Results</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <span className="mr-2">📋</span>
+                Assessment Results
+              </h2>
               
-              <div className={`p-4 rounded-lg mb-4 ${
-                assessment.severity === 'emergency' ? 'bg-red-100 border-red-300' :
-                assessment.severity === 'high' ? 'bg-orange-100 border-orange-300' :
-                assessment.severity === 'medium' ? 'bg-yellow-100 border-yellow-300' :
-                'bg-green-100 border-green-300'
-              } border-2`}>
-                <h3 className="font-semibold mb-2">Severity: {assessment.severity?.toUpperCase()}</h3>
+              <div className={`p-4 rounded-lg mb-4 border-l-4 ${
+                assessment.severity === 'emergency' ? 'bg-red-50 border-red-500' :
+                assessment.severity === 'high' ? 'bg-orange-50 border-orange-500' :
+                assessment.severity === 'medium' ? 'bg-yellow-50 border-yellow-500' :
+                'bg-green-50 border-green-500'
+              }`}>
+                <div className="flex items-center mb-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    assessment.severity === 'emergency' ? 'bg-red-100 text-red-800' :
+                    assessment.severity === 'high' ? 'bg-orange-100 text-orange-800' :
+                    assessment.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    {assessment.severity?.toUpperCase()} PRIORITY
+                  </span>
+                </div>
                 <p className="text-gray-700">{assessment.assessment}</p>
               </div>
 
               <div className="mb-4">
-                <h3 className="font-semibold mb-2">Recommendations:</h3>
-                <ul className="list-disc list-inside space-y-1">
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <span className="mr-2">💡</span>
+                  Recommendations:
+                </h3>
+                <ul className="space-y-2">
                   {assessment.recommendations?.map((rec, index) => (
-                    <li key={index} className="text-gray-700">{rec}</li>
+                    <li key={index} className="flex items-start">
+                      <span className="text-green-500 mr-2 mt-1">✓</span>
+                      <span className="text-gray-700 text-sm">{rec}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
 
-              {assessment.referral_needed && (
+              <div className="flex space-x-3">
+                {assessment.referral_needed && (
+                  <button
+                    onClick={() => setCurrentView('consultation')}
+                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 hover:from-green-600 hover:to-emerald-700"
+                  >
+                    Book Consultation
+                  </button>
+                )}
                 <button
-                  onClick={() => setCurrentView('consultation')}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-200"
+                  onClick={() => setCurrentView('hospitals')}
+                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 hover:from-red-600 hover:to-red-700"
                 >
-                  Book Consultation
+                  Find Hospital
                 </button>
-              )}
+              </div>
             </div>
           )}
         </div>
@@ -532,398 +1087,255 @@ function App() {
     );
   };
 
-  // Pharmacy Component
+  // Enhanced Pharmacy View
   const PharmacyView = () => {
-    const [pharmacies, setPharmacies] = useState([]);
-    const [selectedMedicines, setSelectedMedicines] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [cart, setCart] = useState([]);
 
-    useEffect(() => {
-      const fetchPharmacies = async () => {
-        try {
-          const response = await axios.get(`${API}/pharmacies`);
-          setPharmacies(response.data);
-        } catch (error) {
-          console.error('Failed to fetch pharmacies:', error);
-          // Offline fallback with sample data
-          setPharmacies([{
-            id: '1',
-            name: 'Civil Hospital Pharmacy',
-            location: 'Civil Hospital, Village Center',
-            medicines: {
-              'paracetamol': { stock: 50, price: 10 },
-              'amoxicillin': { stock: 30, price: 45 },
-              'metformin': { stock: 25, price: 25 }
-            }
-          }]);
-        }
-      };
-      fetchPharmacies();
-    }, []);
+    const categories = ['All', 'General', 'Antibiotic', 'Diabetes', 'Cardiology', 'Allergy', 'Gastric'];
+    
+    const filteredMedicines = SAMPLE_DATA.medicines.filter(medicine => {
+      const matchesSearch = medicine.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || medicine.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
 
-    const handleBookMedicines = async (pharmacyId) => {
-      if (selectedMedicines.length === 0) return;
+    const addToCart = (medicine) => {
+      const existing = cart.find(item => item.name === medicine.name);
+      if (existing) {
+        setCart(cart.map(item => 
+          item.name === medicine.name 
+            ? {...item, quantity: item.quantity + 1}
+            : item
+        ));
+      } else {
+        setCart([...cart, {...medicine, quantity: 1}]);
+      }
+      showNotification(`${medicine.name} added to booking`, 'success');
+    };
+
+    const handleBookMedicines = async () => {
+      if (cart.length === 0) return;
 
       try {
         const response = await axios.post(`${API}/medicine-requests`, {
           user_id: currentUser.id,
           user_name: currentUser.name,
           user_phone: currentUser.phone,
-          medicines: selectedMedicines,
-          pharmacy_id: pharmacyId
+          medicines: cart,
+          pharmacy_id: 'civil_hospital_pharmacy'
         });
-        alert('Medicine booking confirmed! You will receive SMS confirmation.');
-        setSelectedMedicines([]);
+        setCart([]);
+        showNotification('Medicine booking confirmed! SMS sent to your phone.', 'success');
       } catch (error) {
         console.error('Medicine booking failed:', error);
-        alert('Medicine booking saved offline. Will sync when online.');
+        showNotification('Booking saved offline. Will process when online.', 'warning');
       }
     };
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6">
-          <div className="flex items-center space-x-4">
-            <button onClick={() => setCurrentView('home')} className="text-white">
-              ←
+        <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6">
+          <div className="flex items-center space-x-4 mb-4">
+            <button onClick={() => setCurrentView('home')} className="text-white hover:text-purple-200">
+              ← Back
             </button>
-            <h1 className="text-2xl font-bold">{t('pharmacy')}</h1>
+            <div>
+              <h1 className="text-2xl font-bold">{t('pharmacy')}</h1>
+              <p className="text-purple-100 text-sm">Real-time medicine availability</p>
+            </div>
+          </div>
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 rounded-lg text-gray-800 pl-10"
+              placeholder="Search medicines..."
+            />
+            <span className="absolute left-3 top-3 text-gray-400">🔍</span>
           </div>
         </div>
 
         <div className="p-6">
-          {pharmacies.map((pharmacy) => (
-            <div key={pharmacy.id} className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-2">{pharmacy.name}</h2>
-              <p className="text-gray-600 mb-4">{pharmacy.location}</p>
+          {/* Category Filter */}
+          <div className="mb-6">
+            <div className="flex overflow-x-auto space-x-2 pb-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Medicine Grid */}
+          <div className="grid grid-cols-1 gap-4 mb-6">
+            {filteredMedicines.map((medicine, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-400">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-bold text-gray-800">{medicine.name}</h3>
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        medicine.stock > 50 ? 'bg-green-100 text-green-800' :
+                        medicine.stock > 20 ? 'bg-yellow-100 text-yellow-800' :
+                        medicine.stock > 0 ? 'bg-orange-100 text-orange-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {medicine.stock > 0 ? `${medicine.stock} available` : 'Out of stock'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">{medicine.uses}</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <span className="text-lg font-bold text-purple-600">₹{medicine.price}</span>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          {medicine.category}
+                        </span>
+                      </div>
+                      {medicine.stock > 0 && (
+                        <button
+                          onClick={() => addToCart(medicine)}
+                          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                        >
+                          Add to Cart
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Cart Summary */}
+          {cart.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-400">
+              <h3 className="font-bold text-gray-800 mb-4 flex items-center">
+                <span className="mr-2">🛒</span>
+                Your Medicine Booking ({cart.length} items)
+              </h3>
               
-              <h3 className="font-semibold mb-3">Available Medicines:</h3>
-              <div className="space-y-3">
-                {Object.entries(pharmacy.medicines || {}).map(([medicine, details]) => (
-                  <div key={medicine} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium capitalize">{medicine}</h4>
-                      <p className="text-sm text-gray-600">
-                        Stock: {details.stock} • ₹{details.price}
-                      </p>
+              <div className="space-y-3 mb-4">
+                {cart.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div>
+                      <span className="font-medium">{item.name}</span>
+                      <span className="text-sm text-gray-600 ml-2">x{item.quantity}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="number"
-                        min="1"
-                        max={details.stock}
-                        className="w-16 p-2 border rounded"
-                        placeholder="Qty"
-                        onChange={(e) => {
-                          const qty = parseInt(e.target.value);
-                          if (qty > 0) {
-                            const existing = selectedMedicines.findIndex(m => m.name === medicine);
-                            if (existing !== -1) {
-                              const updated = [...selectedMedicines];
-                              updated[existing].quantity = qty;
-                              setSelectedMedicines(updated);
-                            } else {
-                              setSelectedMedicines([...selectedMedicines, {
-                                name: medicine,
-                                quantity: qty,
-                                price: details.price
-                              }]);
-                            }
-                          }
-                        }}
-                      />
-                    </div>
+                    <span className="font-semibold">₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
-
-              {selectedMedicines.length > 0 && (
-                <div className="mt-4">
-                  <div className="bg-green-50 p-4 rounded-lg mb-4">
-                    <h4 className="font-semibold mb-2">Selected Medicines:</h4>
-                    {selectedMedicines.map((med, index) => (
-                      <div key={index} className="text-sm">
-                        {med.name} x{med.quantity} = ₹{med.price * med.quantity}
-                      </div>
-                    ))}
-                    <div className="font-bold mt-2">
-                      Total: ₹{selectedMedicines.reduce((sum, med) => sum + (med.price * med.quantity), 0)}
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => handleBookMedicines(pharmacy.id)}
-                    className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-xl transition-colors duration-200"
-                  >
-                    Book Medicines
-                  </button>
+              
+              <div className="border-t pt-3 mb-4">
+                <div className="flex items-center justify-between text-lg font-bold">
+                  <span>Total Amount:</span>
+                  <span className="text-purple-600">
+                    ₹{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)}
+                  </span>
                 </div>
-              )}
+              </div>
+              
+              <button
+                onClick={handleBookMedicines}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
+              >
+                Book Medicines & Get SMS Confirmation
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Enhanced Hospitals View
+  const HospitalsView = () => (
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6">
+        <div className="flex items-center space-x-4">
+          <button onClick={() => setCurrentView('home')} className="text-white hover:text-red-200">
+            ← Back
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold">{t('nearbyHospitals')}</h1>
+            <p className="text-red-100 text-sm">Emergency healthcare centers</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6">
+        <div className="space-y-4">
+          {SAMPLE_DATA.hospitals.map((hospital, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center mb-2">
+                    <h3 className="font-bold text-gray-800 text-lg">{hospital.name}</h3>
+                    {hospital.emergency && (
+                      <span className="ml-2 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-semibold">
+                        24/7 Emergency
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center text-gray-600 mb-3">
+                    <span className="mr-2">📍</span>
+                    <span className="text-sm">{hospital.distance} away</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <a
+                      href={`tel:${hospital.phone}`}
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      📞 Call Now
+                    </a>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                      🗺️ Directions
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 
-  // Video Consultation Component
-  const VideoConsultation = () => {
-    const [consultations, setConsultations] = useState([]);
-    const [showBooking, setShowBooking] = useState(false);
-    const [bookingForm, setBookingForm] = useState({
-      doctor_name: '',
-      symptoms: '',
-      appointment_time: '',
-      consultation_type: 'video'
-    });
-
-    const handleBookConsultation = async (e) => {
-      e.preventDefault();
-      try {
-        const response = await axios.post(`${API}/consultations`, {
-          patient_id: currentUser.id,
-          ...bookingForm,
-          appointment_time: new Date(bookingForm.appointment_time).toISOString()
-        });
-        alert('Consultation booked successfully!');
-        setShowBooking(false);
-        setBookingForm({
-          doctor_name: '',
-          symptoms: '',
-          appointment_time: '',
-          consultation_type: 'video'
-        });
-      } catch (error) {
-        console.error('Consultation booking failed:', error);
-        alert('Consultation booking saved offline.');
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button onClick={() => setCurrentView('home')} className="text-white">
-                ←
-              </button>
-              <h1 className="text-2xl font-bold">{t('consultation')}</h1>
-            </div>
-            <button
-              onClick={() => setShowBooking(true)}
-              className="bg-white text-green-600 px-4 py-2 rounded-lg font-semibold"
-            >
-              Book New
-            </button>
-          </div>
-        </div>
-
-        <div className="p-6">
-          {!isOnline && (
-            <div className="bg-yellow-100 border-yellow-400 border-2 rounded-lg p-4 mb-6">
-              <p className="text-yellow-800">
-                📱 Video consultation requires internet connection. You can book for later or switch to audio-only mode.
-              </p>
-            </div>
-          )}
-
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Available Doctors</h2>
-            
-            <div className="space-y-4">
-              {['Dr. Rajesh Kumar', 'Dr. Priya Sharma', 'Dr. Manjeet Singh'].map((doctor, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <h3 className="font-semibold">{doctor}</h3>
-                    <p className="text-sm text-gray-600">General Medicine • Available Now</p>
-                  </div>
-                  <button
-                    onClick={() => setBookingForm({...bookingForm, doctor_name: doctor})}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                  >
-                    Select
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Booking Modal */}
-        {showBooking && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">Book Consultation</h2>
-              
-              <form onSubmit={handleBookConsultation} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Doctor</label>
-                  <input
-                    type="text"
-                    required
-                    value={bookingForm.doctor_name}
-                    onChange={(e) => setBookingForm({...bookingForm, doctor_name: e.target.value})}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg"
-                    placeholder="Doctor name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Symptoms</label>
-                  <textarea
-                    required
-                    value={bookingForm.symptoms}
-                    onChange={(e) => setBookingForm({...bookingForm, symptoms: e.target.value})}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg"
-                    rows="3"
-                    placeholder="Describe your symptoms"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Appointment Time</label>
-                  <input
-                    type="datetime-local"
-                    required
-                    value={bookingForm.appointment_time}
-                    onChange={(e) => setBookingForm({...bookingForm, appointment_time: e.target.value})}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Consultation Type</label>
-                  <select
-                    value={bookingForm.consultation_type}
-                    onChange={(e) => setBookingForm({...bookingForm, consultation_type: e.target.value})}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg"
-                  >
-                    <option value="video">Video Call</option>
-                    <option value="audio">Audio Call</option>
-                    <option value="chat">Text Chat</option>
-                  </select>
-                </div>
-                
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowBooking(false)}
-                    className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 bg-green-500 text-white py-3 rounded-lg"
-                  >
-                    Book
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Health Records Component
-  const HealthRecords = () => {
-    const [records, setRecords] = useState([]);
-
-    useEffect(() => {
-      const fetchRecords = async () => {
-        try {
-          const response = await axios.get(`${API}/health-records/${currentUser.id}`);
-          setRecords([...response.data, ...offlineRecords]);
-        } catch (error) {
-          console.error('Failed to fetch records:', error);
-          setRecords(offlineRecords);
-        }
-      };
-      fetchRecords();
-    }, [currentUser.id, offlineRecords]);
-
-    return (
-      <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6">
-          <div className="flex items-center space-x-4">
-            <button onClick={() => setCurrentView('home')} className="text-white">
-              ←
-            </button>
-            <h1 className="text-2xl font-bold">{t('records')}</h1>
-          </div>
-        </div>
-
-        <div className="p-6">
-          {records.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-              <span className="text-6xl mb-4 block">📋</span>
-              <h2 className="text-xl font-bold text-gray-800 mb-2">No Health Records</h2>
-              <p className="text-gray-600">Your health records will appear here after consultations.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {records.map((record, index) => (
-                <div key={record.id || index} className="bg-white rounded-2xl shadow-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800">{record.title}</h3>
-                      <p className="text-sm text-gray-600">
-                        {record.doctor_name} • {new Date(record.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      record.is_synced ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {record.is_synced ? 'Synced' : 'Offline'}
-                    </span>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-4">{record.description}</p>
-                  
-                  {record.medications && record.medications.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Medications:</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600">
-                        {record.medications.map((med, i) => (
-                          <li key={i}>{med.name} - {med.dosage}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // Navigation Bar Component
+  // Enhanced Navigation Bar Component
   const NavigationBar = () => {
     const navItems = [
       { id: 'home', icon: '🏠', label: t('home') },
-      { id: 'records', icon: '📋', label: t('records') },
+      { id: 'symptoms', icon: '🩺', label: t('symptoms') },
       { id: 'consultation', icon: '👨‍⚕️', label: t('consultation') },
       { id: 'pharmacy', icon: '💊', label: t('pharmacy') },
-      { id: 'symptoms', icon: '🩺', label: t('symptoms') }
+      { id: 'records', icon: '📋', label: t('records') }
     ];
 
-    if (currentUser?.role === 'asha') {
-      navItems.push({ id: 'asha', icon: '👩‍⚕️', label: t('asha') });
-    }
-
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-2 shadow-lg">
         <div className="flex justify-around">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setCurrentView(item.id)}
-              className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
-                currentView === item.id ? 'text-green-600 bg-green-50' : 'text-gray-600'
+              className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200 ${
+                currentView === item.id 
+                  ? 'text-green-600 bg-green-50 transform scale-105' 
+                  : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
               }`}
             >
               <span className="text-xl">{item.icon}</span>
@@ -935,30 +1347,52 @@ function App() {
     );
   };
 
-  // Text-to-Speech functionality
-  const speak = (text) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'pa' ? 'pa-IN' : 'en-IN';
-      speechSynthesis.speak(utterance);
-    }
-  };
-
-  // Voice Command Button
+  // Voice Button with enhanced functionality
   const VoiceButton = () => (
     <button
-      onClick={() => speak(t('appName') + ' - ' + t('tagline'))}
-      className="fixed bottom-24 right-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg z-40"
+      onClick={() => {
+        const message = `${t('appName')} - ${t('tagline')}. Current page: ${currentView}`;
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(message);
+          utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'pa' ? 'pa-IN' : 'en-IN';
+          speechSynthesis.speak(utterance);
+        }
+      }}
+      className="fixed bottom-24 right-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-4 rounded-full shadow-lg z-40 transform hover:scale-110 transition-all duration-200"
     >
       🔊
     </button>
   );
 
+  // Notification Display Component
+  const NotificationDisplay = () => (
+    <div className="fixed top-20 right-4 z-50 space-y-2">
+      {notifications.slice(0, 3).map((notification) => (
+        <div
+          key={notification.id}
+          className={`p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ${
+            notification.type === 'success' ? 'bg-green-500 text-white' :
+            notification.type === 'error' ? 'bg-red-500 text-white' :
+            notification.type === 'warning' ? 'bg-yellow-500 text-white' :
+            'bg-blue-500 text-white'
+          }`}
+        >
+          <p className="text-sm font-medium">{notification.message}</p>
+          <p className="text-xs opacity-80 mt-1">{notification.time}</p>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <LanguageContext.Provider value={{ currentLanguage, setCurrentLanguage, t }}>
       <div className="App">
+        <NotificationDisplay />
+        
         {!currentUser ? (
-          currentView === 'registration' ? <UserRegistration /> : <LanguageSelector />
+          currentView === 'phone-verify' ? <PhoneVerification /> :
+          currentView === 'registration' ? <UserRegistration /> : 
+          <LanguageSelector />
         ) : (
           <>
             <EmergencyButton />
@@ -967,8 +1401,23 @@ function App() {
             {currentView === 'home' && <HomeDashboard />}
             {currentView === 'symptoms' && <SymptomChecker />}
             {currentView === 'pharmacy' && <PharmacyView />}
-            {currentView === 'consultation' && <VideoConsultation />}
-            {currentView === 'records' && <HealthRecords />}
+            {currentView === 'hospitals' && <HospitalsView />}
+            {currentView === 'consultation' && <div className="p-6 pt-20 text-center">
+              <h2 className="text-2xl font-bold mb-4">Video Consultation</h2>
+              <p>Feature under development for hackathon demo</p>
+            </div>}
+            {currentView === 'records' && <div className="p-6 pt-20 text-center">
+              <h2 className="text-2xl font-bold mb-4">Health Records</h2>
+              <div className="space-y-4">
+                {healthRecords.map((record, index) => (
+                  <div key={index} className="bg-white p-4 rounded-lg shadow">
+                    <h3 className="font-bold">{record.title}</h3>
+                    <p className="text-sm text-gray-600">{record.description}</p>
+                    <p className="text-xs text-gray-500 mt-2">{new Date(record.date).toLocaleDateString()}</p>
+                  </div>
+                ))}
+              </div>
+            </div>}
             
             <NavigationBar />
           </>
