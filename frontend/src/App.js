@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
+
+// Initialize Google AI
+const genAI = GOOGLE_API_KEY ? new GoogleGenerativeAI(GOOGLE_API_KEY) : null;
 
 // Language context
 const LanguageContext = React.createContext();
@@ -942,29 +947,88 @@ function App() {
       if (selectedSymptoms.length === 0) return;
 
       setLoading(true);
+      
+      // Try AI-powered assessment first
+      if (genAI) {
+        try {
+          const model = genAI.getGenerativeModel({ 
+            model: 'gemini-1.5-flash',
+            systemInstruction: `You are a medical AI assistant specialized in rural healthcare in India.
+Provide symptom assessment focused on common rural health issues. Always recommend consulting
+with a doctor for serious symptoms. Be culturally sensitive and use simple language.
+Respond in JSON format with: assessment, severity (low/medium/high/emergency),
+recommendations (array of strings), and referral_needed (boolean).
+Keep your assessment to 1-2 sentences and provide 3-4 practical recommendations.`
+          });
+
+          const symptomsText = selectedSymptoms.join(', ');
+          const prompt = `Patient symptoms: ${symptomsText}. ${additionalInfo ? `Additional information: ${additionalInfo}.` : ''} Please provide a medical assessment suitable for rural healthcare context.`;
+          
+          const result = await model.generateContent(prompt);
+          const responseText = result.response.text();
+          
+          try {
+            // Clean the response and parse JSON
+            const cleanedResponse = responseText.replace(/```json\n?|```\n?/g, '').trim();
+            const aiResult = JSON.parse(cleanedResponse);
+            
+            const aiAssessment = {
+              assessment: aiResult.assessment || 'Assessment completed using AI analysis.',
+              severity: aiResult.severity || 'medium',
+              recommendations: aiResult.recommendations || ['Consult with healthcare provider', 'Monitor symptoms'],
+              referral_needed: aiResult.referral_needed !== false // default to true
+            };
+            
+            setAssessment(aiAssessment);
+            showNotification('AI-powered assessment completed', 'success');
+            setLoading(false);
+            return;
+          } catch (parseError) {
+            console.log('JSON parsing failed, using AI text response:', parseError.message);
+            // Use the raw AI response if JSON parsing fails
+            const fallbackAssessment = {
+              assessment: responseText.substring(0, 200) + (responseText.length > 200 ? '...' : ''),
+              severity: 'medium',
+              recommendations: [
+                'Consult with the nearest healthcare provider for accurate diagnosis',
+                'Monitor your symptoms and note any changes',
+                'Ensure adequate rest and hydration'
+              ],
+              referral_needed: true
+            };
+            setAssessment(fallbackAssessment);
+            showNotification('AI assessment completed', 'success');
+            setLoading(false);
+            return;
+          }
+        } catch (aiError) {
+          console.log('AI service error:', aiError.message);
+          showNotification('AI temporarily unavailable, using basic assessment', 'warning');
+        }
+      }
+      
+      // Fallback to local assessment
       const severityLevel = selectedSymptoms.some(s =>
-        ['chest pain', 'difficulty breathing', 'severe bleeding'].includes(s.toLowerCase())
+        ['chest pain', 'difficulty breathing', 'severe bleeding', 'unconscious'].includes(s.toLowerCase())
       ) ? 'emergency' : selectedSymptoms.some(s =>
-        ['fever', 'headache', 'body ache'].includes(s.toLowerCase())
+        ['fever', 'headache', 'body ache', 'cough'].includes(s.toLowerCase())
       ) ? 'medium' : 'low';
 
       const localAssessment = {
-        assessment: `Based on your symptoms (${selectedSymptoms.join(', ')}), our initial advice is to consult with a healthcare provider. ${additionalInfo ? 'Additional notes: ' + additionalInfo : ''}`,
+        assessment: `Based on your symptoms (${selectedSymptoms.join(', ')}), we recommend consulting with a healthcare provider for proper diagnosis. ${additionalInfo ? 'Additional information noted: ' + additionalInfo : ''}`,
         severity: severityLevel,
         recommendations: [
-          'Consult with the nearest healthcare provider for an accurate diagnosis.',
-          'Carefully monitor your symptoms for any changes.',
-          'Ensure you get adequate rest and stay hydrated.',
-          severityLevel === 'emergency' ? 'This could be serious. Seek immediate medical attention.' : 'Avoid self-medication without a doctor\'s advice.'
-        ].filter(Boolean),
+          'Consult with the nearest healthcare provider for accurate diagnosis',
+          'Monitor your symptoms and note any changes or worsening',
+          'Ensure adequate rest and stay well hydrated',
+          severityLevel === 'emergency' ? '⚠️ This could be serious - seek immediate medical attention' : 'Avoid self-medication without proper medical consultation'
+        ],
         referral_needed: true
       };
-
-      setTimeout(() => {
-        setAssessment(localAssessment);
-        showNotification('Symptom assessment completed', 'success');
-        setLoading(false);
-      }, 600);
+      
+      setAssessment(localAssessment);
+      showNotification('Basic symptom assessment completed', 'info');
+      setLoading(false);
     };
 
     return (
@@ -1033,7 +1097,7 @@ function App() {
                   <div className="spinner-small mr-2"></div>
                   Analyzing Symptoms...
                 </div>
-              ) : 'Check Symptoms'}
+              ) : selectedSymptoms.length > 0 ? 'Get AI-Powered Assessment' : 'Select Symptoms First'}
             </button>
           </div>
 
