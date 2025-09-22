@@ -10,7 +10,8 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+# from emergentintegrations.llm.chat import LlmChat, UserMessage
+import google.generativeai as genai
 import json
 import asyncio
 import base64
@@ -304,42 +305,46 @@ async def get_user_medicine_requests(user_id: str):
 async def perform_symptom_check(symptom_data: SymptomCheckCreate):
     """AI-powered symptom assessment optimized for rural healthcare"""
     try:
-        # Initialize Gemini chat for symptom analysis
-        llm_key = os.environ.get("EMERGENT_LLM_KEY")
-        if not llm_key:
-            raise HTTPException(status_code=500, detail="AI service not available")
-        
-        chat = LlmChat(
-            api_key=llm_key,
-            session_id=f"symptom_check_{symptom_data.user_id}_{datetime.now().timestamp()}",
-            system_message="""You are a medical AI assistant specialized in rural healthcare in India. 
-            Provide symptom assessment focused on common rural health issues. Always recommend consulting 
-            with a doctor for serious symptoms. Be culturally sensitive and use simple language.
-            Respond in JSON format with: assessment, severity (low/medium/high/emergency), 
-            recommendations (list), and referral_needed (boolean)."""
-        ).with_model("gemini", "gemini-2.0-flash")
-        
+        # 1. Configure the API key from your .env file
+        api_key = os.environ.get("GOOGLE_API_KEY") # Or use "EMERGENT_LLM_KEY" if you didn't rename it
+        if not api_key:
+            raise HTTPException(status_code=500, detail="AI service API key not configured")
+        genai.configure(api_key=api_key)
+
+        # 2. Define the system prompt for the AI model
+        system_prompt = """You are a medical AI assistant specialized in rural healthcare in India.
+        Provide symptom assessment focused on common rural health issues. Always recommend consulting
+        with a doctor for serious symptoms. Be culturally sensitive and use simple language.
+        Respond in JSON format with: assessment, severity (low/medium/high/emergency),
+        recommendations (list), and referral_needed (boolean)."""
+
+        # 3. Initialize the model with the system prompt
+        model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash',
+            system_instruction=system_prompt
+        )
+
         symptoms_text = ", ".join(symptom_data.symptoms)
         additional_info = symptom_data.additional_info or ""
-        
-        user_message = UserMessage(
-            text=f"Patient symptoms: {symptoms_text}. Additional information: {additional_info}. Please provide a medical assessment suitable for rural healthcare context."
-        )
-        
-        response = await chat.send_message(user_message)
-        
-        # Parse AI response
+        user_prompt = f"Patient symptoms: {symptoms_text}. Additional information: {additional_info}. Please provide a medical assessment suitable for rural healthcare context."
+
+        # 4. Send the prompt asynchronously and get the response
+        response = await model.generate_content_async(user_prompt)
+
+        # 5. Parse the AI response text
         try:
-            ai_result = json.loads(response)
-        except:
+            # The response now includes formatting, so we clean it
+            cleaned_response = response.text.strip().replace("```json", "").replace("```", "")
+            ai_result = json.loads(cleaned_response)
+        except Exception as json_error:
             # Fallback if JSON parsing fails
             ai_result = {
-                "assessment": response[:500],
+                "assessment": response.text[:500],
                 "severity": "medium",
                 "recommendations": ["Consult with healthcare provider", "Monitor symptoms"],
                 "referral_needed": True
             }
-        
+
         # Create symptom check record
         symptom_check = SymptomCheck(
             user_id=symptom_data.user_id,
@@ -349,7 +354,29 @@ async def perform_symptom_check(symptom_data: SymptomCheckCreate):
             recommendations=ai_result.get("recommendations", []),
             referral_needed=ai_result.get("referral_needed", True)
         )
-        
+
+        await db.symptom_checks.insert_one(symptom_check.dict())
+        return symptom_check
+
+    except Exception as e:
+        # The existing offline fallback logic remains the same
+        severity = "medium"
+        if any(symptom.lower() in ["chest pain", "difficulty breathing", "severe bleeding", "unconscious"]
+               for symptom in symptom_data.symptoms):
+            severity = "emergency"
+        elif any(symptom.lower() in ["fever", "headache", "cough"]
+                for symptom in symptom_data.symptoms):
+            severity = "low"
+
+        symptom_check = SymptomCheck(
+            user_id=symptom_data.user_id,
+            symptoms=symptom_data.symptoms,
+            assessment="Basic symptom assessment completed offline. Please consult with healthcare provider.",
+            severity=severity,
+            recommendations=["Consult with nearest healthcare provider", "Monitor symptoms carefully"],
+            referral_needed=True
+        )
+
         await db.symptom_checks.insert_one(symptom_check.dict())
         return symptom_check
         

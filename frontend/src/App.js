@@ -55,8 +55,9 @@ function App() {
   const [otpCode, setOtpCode] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [symptomAssessment, setSymptomAssessment] = useState(null); // Lifted state
 
-  // Language support - Enhanced with more content
+  // Language support
   const translations = {
     en: {
       appName: "ArogyaCircle",
@@ -199,6 +200,20 @@ function App() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
+  const showNotification = (message, type = 'info') => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      time: 'Just now'
+    };
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]);
+
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 3000);
+  };
+
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
@@ -214,13 +229,16 @@ function App() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Load sample notifications
     setTimeout(() => {
-      setNotifications([
-        { id: 1, type: 'medicine', message: 'Paracetamol is back in stock at Civil Hospital Pharmacy', time: '2 hours ago' },
-        { id: 2, type: 'appointment', message: 'Appointment with Dr. Priya Sharma tomorrow at 2 PM', time: '5 hours ago' },
-        { id: 3, type: 'health', message: 'Time for your monthly diabetes checkup', time: '1 day ago' }
-      ]);
+      const sampleNotifications = [
+        { id: 1, type: 'medicine', message: 'Paracetamol is back in stock at Civil Hospital Pharmacy' },
+        { id: 2, type: 'appointment', message: 'Appointment with Dr. Priya Sharma tomorrow at 2 PM' },
+        { id: 3, type: 'health', message: 'Time for your monthly diabetes checkup' }
+      ];
+
+      sampleNotifications.forEach(notif => {
+        showNotification(notif.message, notif.type);
+      });
     }, 2000);
 
     return () => {
@@ -235,7 +253,7 @@ function App() {
     if (savedRecords) {
       setOfflineRecords(JSON.parse(savedRecords));
     }
-    
+
     const savedUser = localStorage.getItem('arogya_user');
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
@@ -277,20 +295,6 @@ function App() {
     setHealthRecords(sampleRecords);
   }, []);
 
-  const showNotification = (message, type = 'info') => {
-    const notification = {
-      id: Date.now(),
-      message,
-      type,
-      time: 'Just now'
-    };
-    setNotifications(prev => [notification, ...prev.slice(0, 4)]);
-    
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== notification.id));
-    }, 5000);
-  };
-
   // Sync offline data when coming back online
   const syncOfflineData = async () => {
     if (offlineRecords.length > 0) {
@@ -317,7 +321,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
-        
+
         <div className="text-center mb-8">
           <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-4xl">🏥</span>
@@ -326,7 +330,7 @@ function App() {
           <p className="text-gray-600 text-lg">{t('selectLanguage')}</p>
           <div className="text-sm text-gray-500 mt-2">Serving 600M+ Rural Indians</div>
         </div>
-        
+
         <div className="space-y-4">
           {[
             { code: 'en', name: 'English', native: 'English', icon: '🇬🇧' },
@@ -356,7 +360,7 @@ function App() {
             </button>
           ))}
         </div>
-        
+
         <div className="mt-8 text-center">
           <div className="text-xs text-gray-500">Trusted by Rural Communities</div>
           <div className="flex justify-center mt-2 space-x-1">
@@ -380,9 +384,8 @@ function App() {
         showNotification('कृपया वैध फोन नंबर दर्ज करें', 'error');
         return;
       }
-      
+
       setLoading(true);
-      // Simulate OTP sending
       setTimeout(() => {
         const otp = generateOTP();
         setOtpCode(otp);
@@ -397,7 +400,7 @@ function App() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-500"></div>
-          
+
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">📱</span>
@@ -405,7 +408,7 @@ function App() {
             <h1 className="text-3xl font-bold text-blue-600 mb-2">{t('verifyPhone')}</h1>
             <p className="text-gray-600">We'll send you an OTP to verify your number</p>
           </div>
-          
+
           {!showOTP ? (
             <div className="space-y-6">
               <div>
@@ -424,7 +427,7 @@ function App() {
                   />
                 </div>
               </div>
-              
+
               <button
                 onClick={handleSendOTP}
                 disabled={loading || phone.length < 10}
@@ -475,7 +478,7 @@ function App() {
             Demo OTP: <span className="font-bold text-blue-600">{otpCode}</span>
           </div>
         </div>
-        
+
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             {t('enterOTP')}
@@ -489,7 +492,7 @@ function App() {
             maxLength="6"
           />
         </div>
-        
+
         <button
           onClick={handleVerifyOTP}
           disabled={loading || enteredOTP.length < 6}
@@ -502,7 +505,7 @@ function App() {
             </div>
           ) : t('verify')}
         </button>
-        
+
         <button
           onClick={() => {
             const newOTP = generateOTP();
@@ -553,12 +556,12 @@ function App() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500"></div>
-          
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-green-600 mb-2">{t('appName')}</h1>
             <p className="text-gray-600">{t('tagline')}</p>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -574,7 +577,7 @@ function App() {
                   placeholder={t('yourName')}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Age
@@ -589,7 +592,7 @@ function App() {
                 />
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 {t('phoneNumber')}
@@ -601,7 +604,7 @@ function App() {
                 className="w-full p-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-600"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -616,7 +619,7 @@ function App() {
                   placeholder={t('village')}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Gender
@@ -634,7 +637,7 @@ function App() {
                 </select>
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Emergency Contact
@@ -647,7 +650,7 @@ function App() {
                 placeholder="+91-9876543210"
               />
             </div>
-            
+
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 text-lg"
@@ -660,38 +663,67 @@ function App() {
     );
   };
 
-  // Enhanced Emergency Button Component
-  const EmergencyButton = () => {
-    const handleEmergency = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const emergencyData = {
-            user_id: currentUser.id,
-            user_name: currentUser.name,
-            user_phone: currentUser.phone,
-            location: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            },
-            alert_type: "medical",
-            description: "Emergency help requested"
-          };
+  // Draggable Emergency Button Component
+  const DraggableEmergencyButton = () => {
+    const buttonRef = useRef(null);
+    const [position, setPosition] = useState({ top: 16, right: 16 });
+    const [isDragging, setIsDragging] = useState(false);
 
-          try {
-            await axios.post(`${API}/emergency-alert`, emergencyData);
-            showNotification('🚨 Emergency services notified! Help is on the way.', 'error');
-          } catch (error) {
-            console.error('Emergency alert failed:', error);
-            showNotification('🚨 Emergency alert sent (offline mode)', 'warning');
-          }
+    const handleDragStart = (e) => {
+      setIsDragging(true);
+      const event = e.touches ? e.touches[0] : e;
+      const initialX = event.clientX;
+      const initialY = event.clientY;
+      const { top, right } = buttonRef.current.getBoundingClientRect();
+
+      const handleDragMove = (moveEvent) => {
+        const move = moveEvent.touches ? moveEvent.touches[0] : moveEvent;
+        const dx = move.clientX - initialX;
+        const dy = move.clientY - initialY;
+
+        // Convert right position to left for easier calculation
+        const initialLeft = window.innerWidth - right - buttonRef.current.offsetWidth;
+
+        setPosition({
+          top: top + dy,
+          // Calculate new right based on change from initial left
+          right: window.innerWidth - (initialLeft + dx) - buttonRef.current.offsetWidth
         });
-      }
+      };
+
+      const handleDragEnd = () => {
+        setIsDragging(false);
+        window.removeEventListener('mousemove', handleDragMove);
+        window.removeEventListener('mouseup', handleDragEnd);
+        window.removeEventListener('touchmove', handleDragMove);
+        window.removeEventListener('touchend', handleDragEnd);
+      };
+
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+    };
+
+    const handleEmergencyCall = () => {
+      // Prevent call if button was just dragged
+      if (isDragging) return;
+      window.location.href = 'tel:102';
     };
 
     return (
       <button
-        onClick={handleEmergency}
-        className="fixed top-4 right-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl z-50 emergency-pulse text-sm"
+        ref={buttonRef}
+        onMouseDown={handleDragStart}
+        onTouchStart={handleDragStart}
+        onClick={handleEmergencyCall}
+        style={{
+          top: `calc(env(safe-area-inset-top) + ${position.top}px)`,
+          right: `${position.right}px`,
+          position: 'fixed',
+          touchAction: 'none' // Prevents page scroll while dragging
+        }}
+        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl z-50 emergency-pulse text-sm"
       >
         🚨 {t('emergencyButton')}
       </button>
@@ -753,8 +785,7 @@ function App() {
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        {/* Enhanced Header */}
-        <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white p-6 rounded-b-3xl shadow-lg">
+        <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white p-6 rounded-b-3xl shadow-lg" style={{paddingTop: 'calc(env(safe-area-inset-top) + 48px)'}}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
@@ -777,8 +808,6 @@ function App() {
               </div>
             </div>
           </div>
-          
-          {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-4 mt-4">
             <div className="bg-white bg-opacity-10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold">{healthRecords.length}</div>
@@ -794,26 +823,20 @@ function App() {
             </div>
           </div>
         </div>
-
-        {/* Notifications */}
-        {notifications.length > 0 && (
-          <div className="p-4">
-            <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
-              <span className="mr-2">🔔</span>
-              Recent Updates
-            </h3>
-            <div className="space-y-2">
-              {notifications.slice(0, 2).map((notification) => (
-                <div key={notification.id} className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-400">
-                  <p className="text-sm text-gray-700">{notification.message}</p>
-                  <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                </div>
-              ))}
-            </div>
+        <div className="p-4">
+          <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+            <span className="mr-2">🔔</span>
+            Recent Updates
+          </h3>
+          <div className="space-y-2">
+            {notifications.slice(0, 2).map((notification) => (
+              <div key={notification.id} className="bg-white rounded-lg p-3 shadow-sm border-l-4 border-blue-400">
+                <p className="text-sm text-gray-700">{notification.message}</p>
+                <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+              </div>
+            ))}
           </div>
-        )}
-
-        {/* Quick Actions Grid */}
+        </div>
         <div className="p-6">
           <h2 className="text-lg font-bold text-gray-800 mb-4">Healthcare Services</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -836,19 +859,16 @@ function App() {
             ))}
           </div>
         </div>
-
-        {/* Available Doctors Section */}
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-800">{t('availableDoctors')}</h2>
-            <button 
+            <button
               onClick={() => setCurrentView('consultation')}
               className="text-green-600 text-sm font-semibold"
             >
               {t('viewAll')} →
             </button>
           </div>
-          
           <div className="space-y-3">
             {SAMPLE_DATA.doctors.filter(d => d.available).slice(0, 2).map((doctor) => (
               <div key={doctor.id} className="bg-white rounded-xl shadow-sm p-4">
@@ -879,8 +899,6 @@ function App() {
             ))}
           </div>
         </div>
-
-        {/* Health Tips Section */}
         <div className="p-6">
           <h2 className="text-lg font-bold text-gray-800 mb-4">{t('todaysTips')}</h2>
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg p-6">
@@ -901,12 +919,17 @@ function App() {
   };
 
   // Enhanced Symptom Checker with more features
-  const SymptomChecker = () => {
-    const [symptoms, setSymptoms] = useState([]);
+  const SymptomChecker = ({ assessment, setAssessment }) => {
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-    const [assessment, setAssessment] = useState(null);
     const [loading, setLoading] = useState(false);
     const [additionalInfo, setAdditionalInfo] = useState('');
+    const resultsRef = useRef(null);
+
+    useEffect(() => {
+      if (assessment && resultsRef.current) {
+        resultsRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, [assessment]);
 
     const commonSymptoms = [
       'Fever', 'Headache', 'Cough', 'Sore throat', 'Body ache',
@@ -917,47 +940,38 @@ function App() {
 
     const handleSymptomCheck = async () => {
       if (selectedSymptoms.length === 0) return;
-      
+
       setLoading(true);
-      try {
-        const response = await axios.post(`${API}/symptom-check`, {
-          user_id: currentUser.id,
-          symptoms: selectedSymptoms,
-          additional_info: additionalInfo
-        });
-        setAssessment(response.data);
+      const severityLevel = selectedSymptoms.some(s =>
+        ['chest pain', 'difficulty breathing', 'severe bleeding'].includes(s.toLowerCase())
+      ) ? 'emergency' : selectedSymptoms.some(s =>
+        ['fever', 'headache', 'body ache'].includes(s.toLowerCase())
+      ) ? 'medium' : 'low';
+
+      const localAssessment = {
+        assessment: `Based on your symptoms (${selectedSymptoms.join(', ')}), our initial advice is to consult with a healthcare provider. ${additionalInfo ? 'Additional notes: ' + additionalInfo : ''}`,
+        severity: severityLevel,
+        recommendations: [
+          'Consult with the nearest healthcare provider for an accurate diagnosis.',
+          'Carefully monitor your symptoms for any changes.',
+          'Ensure you get adequate rest and stay hydrated.',
+          severityLevel === 'emergency' ? 'This could be serious. Seek immediate medical attention.' : 'Avoid self-medication without a doctor\'s advice.'
+        ].filter(Boolean),
+        referral_needed: true
+      };
+
+      setTimeout(() => {
+        setAssessment(localAssessment);
         showNotification('Symptom assessment completed', 'success');
-      } catch (error) {
-        console.error('Symptom check failed:', error);
-        // Enhanced offline fallback
-        const severityLevel = selectedSymptoms.some(s => 
-          ['chest pain', 'difficulty breathing', 'severe bleeding'].includes(s.toLowerCase())
-        ) ? 'emergency' : selectedSymptoms.some(s => 
-          ['fever', 'headache', 'body ache'].includes(s.toLowerCase())
-        ) ? 'medium' : 'low';
-        
-        const offlineAssessment = {
-          assessment: `Based on your symptoms (${selectedSymptoms.join(', ')}), we recommend consulting with a healthcare provider. ${additionalInfo ? 'Additional information noted.' : ''}`,
-          severity: severityLevel,
-          recommendations: [
-            "Consult with nearest healthcare provider",
-            "Monitor symptoms carefully",
-            "Rest and stay hydrated",
-            severityLevel === 'emergency' ? "Seek immediate medical attention" : "Take prescribed medications if any"
-          ].filter(Boolean),
-          referral_needed: true
-        };
-        setAssessment(offlineAssessment);
-        showNotification('Assessment completed offline', 'warning');
-      }
-      setLoading(false);
+        setLoading(false);
+      }, 600);
     };
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6" style={{paddingTop: 'calc(env(safe-area-inset-top) + 48px)'}}>
           <div className="flex items-center space-x-4">
-            <button onClick={() => setCurrentView('home')} className="text-white hover:text-blue-200">
+            <button onClick={() => { setAssessment(null); setCurrentView('home'); }} className="text-white hover:text-blue-200">
               ← Back
             </button>
             <div>
@@ -973,7 +987,7 @@ function App() {
               <span className="mr-2">🩺</span>
               Select Your Symptoms
             </h2>
-            
+
             <div className="grid grid-cols-2 gap-3 mb-6">
               {commonSymptoms.map((symptom, index) => (
                 <button
@@ -1024,12 +1038,12 @@ function App() {
           </div>
 
           {assessment && (
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div ref={resultsRef} className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                 <span className="mr-2">📋</span>
                 Assessment Results
               </h2>
-              
+
               <div className={`p-4 rounded-lg mb-4 border-l-4 ${
                 assessment.severity === 'emergency' ? 'bg-red-50 border-red-500' :
                 assessment.severity === 'high' ? 'bg-orange-50 border-orange-500' :
@@ -1094,7 +1108,7 @@ function App() {
     const [cart, setCart] = useState([]);
 
     const categories = ['All', 'General', 'Antibiotic', 'Diabetes', 'Cardiology', 'Allergy', 'Gastric'];
-    
+
     const filteredMedicines = SAMPLE_DATA.medicines.filter(medicine => {
       const matchesSearch = medicine.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || medicine.category === selectedCategory;
@@ -1104,8 +1118,8 @@ function App() {
     const addToCart = (medicine) => {
       const existing = cart.find(item => item.name === medicine.name);
       if (existing) {
-        setCart(cart.map(item => 
-          item.name === medicine.name 
+        setCart(cart.map(item =>
+          item.name === medicine.name
             ? {...item, quantity: item.quantity + 1}
             : item
         ));
@@ -1136,7 +1150,7 @@ function App() {
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20">
-        <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6" style={{paddingTop: 'calc(env(safe-area-inset-top) + 48px)'}}>
           <div className="flex items-center space-x-4 mb-4">
             <button onClick={() => setCurrentView('home')} className="text-white hover:text-purple-200">
               ← Back
@@ -1146,8 +1160,6 @@ function App() {
               <p className="text-purple-100 text-sm">Real-time medicine availability</p>
             </div>
           </div>
-          
-          {/* Search Bar */}
           <div className="relative">
             <input
               type="text"
@@ -1159,9 +1171,7 @@ function App() {
             <span className="absolute left-3 top-3 text-gray-400">🔍</span>
           </div>
         </div>
-
         <div className="p-6">
-          {/* Category Filter */}
           <div className="mb-6">
             <div className="flex overflow-x-auto space-x-2 pb-2">
               {categories.map((category) => (
@@ -1179,8 +1189,6 @@ function App() {
               ))}
             </div>
           </div>
-
-          {/* Medicine Grid */}
           <div className="grid grid-cols-1 gap-4 mb-6">
             {filteredMedicines.map((medicine, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm p-4 border-l-4 border-purple-400">
@@ -1219,15 +1227,12 @@ function App() {
               </div>
             ))}
           </div>
-
-          {/* Cart Summary */}
           {cart.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4 border-green-400">
               <h3 className="font-bold text-gray-800 mb-4 flex items-center">
                 <span className="mr-2">🛒</span>
                 Your Medicine Booking ({cart.length} items)
               </h3>
-              
               <div className="space-y-3 mb-4">
                 {cart.map((item, index) => (
                   <div key={index} className="flex items-center justify-between">
@@ -1239,7 +1244,6 @@ function App() {
                   </div>
                 ))}
               </div>
-              
               <div className="border-t pt-3 mb-4">
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total Amount:</span>
@@ -1248,7 +1252,6 @@ function App() {
                   </span>
                 </div>
               </div>
-              
               <button
                 onClick={handleBookMedicines}
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200"
@@ -1263,57 +1266,70 @@ function App() {
   };
 
   // Enhanced Hospitals View
-  const HospitalsView = () => (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6">
-        <div className="flex items-center space-x-4">
-          <button onClick={() => setCurrentView('home')} className="text-white hover:text-red-200">
-            ← Back
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">{t('nearbyHospitals')}</h1>
-            <p className="text-red-100 text-sm">Emergency healthcare centers</p>
+  const HospitalsView = () => {
+    const openDirections = (hospital) => {
+      const destination = encodeURIComponent(hospital.name);
+      const openWithOrigin = (origin) => {
+        const url = `https://maps.google.com/?q=${destination}`;
+        window.open(url, '_blank');
+      };
+      openWithOrigin('');
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6" style={{paddingTop: 'calc(env(safe-area-inset-top) + 48px)'}}>
+          <div className="flex items-center space-x-4">
+            <button onClick={() => setCurrentView('home')} className="text-white hover:text-red-200">
+              ← Back
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">{t('nearbyHospitals')}</h1>
+              <p className="text-red-100 text-sm">Emergency healthcare centers</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="p-6">
-        <div className="space-y-4">
-          {SAMPLE_DATA.hospitals.map((hospital, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center mb-2">
-                    <h3 className="font-bold text-gray-800 text-lg">{hospital.name}</h3>
-                    {hospital.emergency && (
-                      <span className="ml-2 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-semibold">
-                        24/7 Emergency
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center text-gray-600 mb-3">
-                    <span className="mr-2">📍</span>
-                    <span className="text-sm">{hospital.distance} away</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <a
-                      href={`tel:${hospital.phone}`}
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      📞 Call Now
-                    </a>
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                      🗺️ Directions
-                    </button>
+        <div className="p-6">
+          <div className="space-y-4">
+            {SAMPLE_DATA.hospitals.map((hospital, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-lg p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h3 className="font-bold text-gray-800 text-lg">{hospital.name}</h3>
+                      {hospital.emergency && (
+                        <span className="ml-2 bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-semibold">
+                          24/7 Emergency
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center text-gray-600 mb-3">
+                      <span className="mr-2">📍</span>
+                      <span className="text-sm">{hospital.distance} away</span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <a
+                        href={`tel:${hospital.phone}`}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                      >
+                        📞 Call Now
+                      </a>
+                      <button
+                        onClick={() => openDirections(hospital)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                      >
+                        🗺️ Directions
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Enhanced Navigation Bar Component
   const NavigationBar = () => {
@@ -1333,8 +1349,8 @@ function App() {
               key={item.id}
               onClick={() => setCurrentView(item.id)}
               className={`flex flex-col items-center space-y-1 p-2 rounded-lg transition-all duration-200 ${
-                currentView === item.id 
-                  ? 'text-green-600 bg-green-50 transform scale-105' 
+                currentView === item.id
+                  ? 'text-green-600 bg-green-50 transform scale-105'
                   : 'text-gray-600 hover:text-green-600 hover:bg-green-50'
               }`}
             >
@@ -1348,13 +1364,20 @@ function App() {
   };
 
   // Voice Button with enhanced functionality
-  const VoiceButton = () => (
+  const VoiceButton = ({ assessment }) => (
     <button
       onClick={() => {
-        const message = `${t('appName')} - ${t('tagline')}. Current page: ${currentView}`;
+        let message;
+        if (currentView === 'symptoms' && assessment) {
+          message = `Assessment Result: ${assessment.assessment}. Recommendations: ${assessment.recommendations.join('. ')}`;
+        } else {
+          message = `${t('appName')} - ${t('tagline')}. Current page: ${currentView}`;
+        }
+
         if ('speechSynthesis' in window) {
           const utterance = new SpeechSynthesisUtterance(message);
           utterance.lang = currentLanguage === 'hi' ? 'hi-IN' : currentLanguage === 'pa' ? 'pa-IN' : 'en-IN';
+          speechSynthesis.cancel(); // Cancel any previous speech
           speechSynthesis.speak(utterance);
         }
       }}
@@ -1366,7 +1389,7 @@ function App() {
 
   // Notification Display Component
   const NotificationDisplay = () => (
-    <div className="fixed top-20 right-4 z-50 space-y-2">
+    <div className="fixed top-0 right-4 z-50 space-y-2" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 20px)' }}>
       {notifications.slice(0, 3).map((notification) => (
         <div
           key={notification.id}
@@ -1374,7 +1397,10 @@ function App() {
             notification.type === 'success' ? 'bg-green-500 text-white' :
             notification.type === 'error' ? 'bg-red-500 text-white' :
             notification.type === 'warning' ? 'bg-yellow-500 text-white' :
-            'bg-blue-500 text-white'
+            notification.type === 'medicine' ? 'bg-blue-500 text-white' :
+            notification.type === 'appointment' ? 'bg-purple-500 text-white' :
+            notification.type === 'health' ? 'bg-teal-500 text-white' :
+            'bg-gray-800 text-white'
           }`}
         >
           <p className="text-sm font-medium">{notification.message}</p>
@@ -1388,25 +1414,25 @@ function App() {
     <LanguageContext.Provider value={{ currentLanguage, setCurrentLanguage, t }}>
       <div className="App">
         <NotificationDisplay />
-        
+
         {!currentUser ? (
           currentView === 'phone-verify' ? <PhoneVerification /> :
-          currentView === 'registration' ? <UserRegistration /> : 
+          currentView === 'registration' ? <UserRegistration /> :
           <LanguageSelector />
         ) : (
           <>
-            <EmergencyButton />
-            <VoiceButton />
-            
+            <DraggableEmergencyButton />
+            <VoiceButton assessment={symptomAssessment} />
+
             {currentView === 'home' && <HomeDashboard />}
-            {currentView === 'symptoms' && <SymptomChecker />}
+            {currentView === 'symptoms' && <SymptomChecker assessment={symptomAssessment} setAssessment={setSymptomAssessment} />}
             {currentView === 'pharmacy' && <PharmacyView />}
             {currentView === 'hospitals' && <HospitalsView />}
-            {currentView === 'consultation' && <div className="p-6 pt-20 text-center">
+            {currentView === 'consultation' && <div className="p-6 text-center" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 96px)' }}>
               <h2 className="text-2xl font-bold mb-4">Video Consultation</h2>
               <p>Feature under development for hackathon demo</p>
             </div>}
-            {currentView === 'records' && <div className="p-6 pt-20 text-center">
+            {currentView === 'records' && <div className="p-6 text-center" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 96px)' }}>
               <h2 className="text-2xl font-bold mb-4">Health Records</h2>
               <div className="space-y-4">
                 {healthRecords.map((record, index) => (
