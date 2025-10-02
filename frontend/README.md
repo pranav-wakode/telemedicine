@@ -1,70 +1,142 @@
-# Getting Started with Create React App
+# ArogyaCircle: AI-Powered Rural Healthcare Companion 🩺
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+ArogyaCircle is a mobile-first healthcare application prototype designed to bridge the healthcare accessibility gap in rural communities. By leveraging AI and providing a suite of essential services, it aims to empower individuals with the tools they need for better health management.
 
-## Available Scripts
+<p align="center">
+  <img src="../screenshots/arogya_circle.jpg" width="200" alt="Home">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../screenshots/services.jpg" width="200" alt="Services">
+</p>
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🎯 The Problem
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+In many rural areas, access to timely medical advice, pharmacies with available stock, and emergency services is a significant challenge. This digital divide can lead to delayed treatment and poorer health outcomes. ArogyaCircle is designed to be a reliable first point of contact for non-critical health queries and a vital tool during emergencies.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 💡 Our Solution
 
-### `npm test`
+ArogyaCircle provides an intuitive, easy-to-navigate platform that offers:
+* **Instant preliminary health assessment** through an AI-powered symptom checker.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<p align="center">
+  <img src="../screenshots/symptom_checker.jpg" width="200" alt="AI-powered symptom checker">
+</p>
 
-### `npm run build`
+* **Real-time information** on medicine availability and nearby medical facilities.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<p align="center">
+  <img src="../screenshots/medicine.jpg" width="200" alt="Real-time medicine availability">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../screenshots/nearby_hospitals.jpg" width="200" alt="Nearby Hospitals">
+</p>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* **A centralized hub** for managing digital health records and accessing medical professionals.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<p align="center">
+  <img src="../screenshots/health_records.jpg" width="200" alt="Health records">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="../screenshots/doctors-tips.jpg" width="200" alt="Available Doctors">
+</p>
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## ✨ Features In-Depth
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **🤖 AI-Powered Symptom Checker**
+    * Select from a comprehensive list of common symptoms.
+    * Receive an AI-generated assessment indicating potential severity (Low, Medium, High).
+    * Get clear recommendations for next steps.
+    * **Disclaimer**: This feature provides a preliminary assessment and is not a substitute for professional medical diagnosis.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+* **🚑 Emergency Services**
+    * **Nearby Hospitals**: View a list of local hospitals, sorted by distance.
+    * **One-Tap Actions**: Call the hospital directly or get driving directions via Google Maps.
+    * **24/7 Availability**: See which hospitals offer emergency services around the clock.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* **💊 Pharmacy Locator**
+    * Search for medicines and view their real-time stock availability.
+    * Filter medicines by category (General, Antibiotic, Diabetes, etc.).
+    * Add required medicines to a cart for easy tracking.
 
-## Learn More
+* **🧑‍⚕️ Consultation & Health Records**
+    * **Available Doctors**: View a list of doctors, their specialization, rating, and availability. (Booking is a prototype feature).
+    * **Health Records**: Securely access your digital health history, including past treatments, lab reports, and check-ups.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🛠️ Tech Stack & Architecture
 
-### Code Splitting
+This project uses a modern client-server architecture.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### **Frontend (Client)**
+* **Framework**: [React.js](https://reactjs.org/)
+* **Mobile Wrapper**: [Capacitor](https://capacitorjs.com/) (to build the native Android app)
+* **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+* **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
+* **Package Manager**: [Yarn](https://yarnpkg.com/)
 
-### Analyzing the Bundle Size
+#### **Backend (Server)**
+* **Language**: [Python](https://www.python.org/)
+* **Dependencies**: Managed via `requirements.txt`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🚀 Getting Started
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+To get this project running on your local machine, follow these steps.
 
-### Advanced Configuration
+### **Prerequisites**
+* Node.js (v18 or higher) & Yarn
+* Python (v3.8 or higher) & Pip
+* Android Studio & configured Android Emulator/Device
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### **1. Clone the Repository**
+```sh
+git clone https://github.com/wakodepranav2005-git/telemedicine.git
+cd telemedicine
+```
 
-### Deployment
+### **2. Backend Setup**
+```sh
+cd backend
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+# Install dependencies
+pip install -r requirements.txt
 
-### `npm run build` fails to minify
+# Run the backend server (typically on port 5000)
+python server.py
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### **3. Frontend Setup**
+```sh
+cd frontend
+
+# Install dependencies
+yarn install
+
+# Run the React development server (typically on port 3000)
+yarn start
+```
+
+### **4. Running on Android**
+```sh
+# In the /frontend directory
+# Sync your web code with the native Android project
+npx capacitor sync
+
+# Open the Android project in Android Studio
+npx capacitor open android
+```
+Once Android Studio is open, wait for Gradle to sync, then run the app on your selected emulator or physical device.
+
+---
+
+## 🗺️ Future Roadmap
+
+This is a prototype, but here are some features planned for the future:
+- [ ] **Video Consultation**: Implement live video calls with doctors.
+- [ ] **Voice-Guided Navigation**: Complete the screen reader functionality for enhanced accessibility.
+- [ ] **Multi-Language Support**: Add support for local languages.
+- [ ] **Push Notifications**: Send reminders for appointments and medicine.
+- [ ] **iOS Version**: Build and deploy an iOS version of the app.
