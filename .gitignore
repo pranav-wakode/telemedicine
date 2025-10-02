@@ -8,10 +8,17 @@ env/
 
 # Node / Frontend
 frontend/node_modules/
+frontend/.pnp.js
+frontend/.pnp
 frontend/build/
 frontend/dist/
 frontend/android/
 frontend/ios/
+frontend/.env
+frontend/.env.production.local
+frontend/.env.test.local
+frontend/.env.development.local
+frontend/.env.local
 frontend/package-lock.json
 .DS_Store
 npm-debug.log*
