@@ -90,7 +90,7 @@ To get this project running on your local machine, follow these steps.
 
 ### **1. Clone the Repository**
 ```sh
-git clone https://github.com/wakodepranav2005-git/telemedicine.git
+git clone https://github.com/pranav-wakode/telemedicine.git
 cd telemedicine
 ```
 
